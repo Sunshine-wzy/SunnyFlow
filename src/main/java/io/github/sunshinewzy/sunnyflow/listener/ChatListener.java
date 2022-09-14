@@ -2,7 +2,6 @@ package io.github.sunshinewzy.sunnyflow.listener;
 
 import io.github.sunshinewzy.sunnyflow.SunnyFlow;
 import io.github.sunshinewzy.sunnyflow.handler.HandlerManager;
-import io.github.sunshinewzy.sunnyflow.handler.SunnyFlowHandler;
 import io.github.sunshinewzy.sunnyflow.handler.impl.ChatHandler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

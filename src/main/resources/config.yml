@@ -1,3 +1,3 @@
 password:
-  - text: password
-  - md5: password
+  md5: password
+  text: password

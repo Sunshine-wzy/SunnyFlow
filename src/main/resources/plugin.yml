@@ -1,5 +1,5 @@
 name: SunnyFlow
-version: ${version}
+version: 1.0.0
 main: io.github.sunshinewzy.sunnyflow.SunnyFlow
 api-version: 1.13
 author: Sunshine_wzy

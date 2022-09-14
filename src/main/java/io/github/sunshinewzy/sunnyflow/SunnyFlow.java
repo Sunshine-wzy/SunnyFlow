@@ -2,10 +2,14 @@ package io.github.sunshinewzy.sunnyflow;
 
 import io.github.sunshinewzy.sunnyflow.listener.ChatListener;
 import io.github.sunshinewzy.sunnyflow.server.SunnyFlowServer;
+import io.github.sunshinewzy.sunnyflow.util.SunnyFlowUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 
 public class SunnyFlow extends JavaPlugin {
 	public static final PluginManager manager = Bukkit.getPluginManager();
@@ -14,14 +18,11 @@ public class SunnyFlow extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		ConfigurationSection password = getConfig().getConfigurationSection("password");
-		if(password == null) {
-			getLogger().info("config.yml 中缺失 password 配置项");
+		if(!loadConfig()) {
+			getLogger().info("配置文件加载失败!");
 			return;
 		}
-		
-		String text = password.getString("text");
-		String md5 = password.getString("md5");
+		getLogger().info("配置文件加载成功!");
 
 		try {
 			sunnyFlowServer = new SunnyFlowServer(getLogger(), 25585);
@@ -43,6 +44,35 @@ public class SunnyFlow extends JavaPlugin {
 		manager.registerEvents(new ChatListener(), this);
 	}
 
+	private boolean loadConfig() {
+		saveDefaultConfig();
+		
+		ConfigurationSection password = getConfig().getConfigurationSection("password");
+		if(password == null) {
+			getLogger().info("config.yml 中缺失 password 配置项");
+			return false;
+		}
+
+		Optional.ofNullable(password.getString("md5"))
+				.filter((md5) -> !md5.contentEquals("password"))
+				.ifPresent((md5) -> SunnyFlowServer.password = md5);
+		if(SunnyFlowServer.password != null) return true;
+
+		Optional.ofNullable(password.getString("text"))
+				.filter((text) -> !text.contentEquals("password"))
+				.ifPresent((text) -> {
+					try {
+						SunnyFlowServer.password = SunnyFlowUtil.stringToMD5(text);
+					} catch (NoSuchAlgorithmException ex) {
+						ex.printStackTrace();
+					}
+				});
+		if(SunnyFlowServer.password != null) return true;
+
+		getLogger().info("请修改 password 项中的 md5 或 text 项");
+		return false;
+	}
+	
 
 	public static SunnyFlowServer getSunnyFlowServer() {
 		return sunnyFlowServer;

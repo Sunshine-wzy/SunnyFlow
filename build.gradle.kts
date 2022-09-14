@@ -16,6 +16,7 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT")
+    compileOnly("org.jetbrains:annotations:23.0.0")
     
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
@@ -30,16 +31,16 @@ tasks {
         destinationDirectory.set(file("E:/Kotlin/Debug/Spigot-1.18.2/plugins"))
     }
     
-    processResources {
-        val props = mutableMapOf(
-            "version" to version
-        )
-        
-        inputs.properties(props)
-        
-        filteringCharset = "UTF-8"
-        filesMatching("*") {
-            expand(props)
-        }
-    }
+//    processResources {
+//        val props = mutableMapOf(
+//            "version" to version
+//        )
+//        
+//        inputs.properties(props)
+//        
+//        filteringCharset = "UTF-8"
+//        filesMatching("*") {
+//            expand(props)
+//        }
+//    }
 }

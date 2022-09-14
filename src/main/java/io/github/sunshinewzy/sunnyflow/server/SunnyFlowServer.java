@@ -1,17 +1,17 @@
 package io.github.sunshinewzy.sunnyflow.server;
 
 import io.github.sunshinewzy.sunnyflow.handler.HandlerManager;
-import io.github.sunshinewzy.sunnyflow.util.SunnyFlowUtil;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.util.logging.Logger;
 
 public class SunnyFlowServer extends Thread {
+	public static String password;
+	
 	private final Logger logger;
 	private final ServerSocket serverSocket;
 	private final HandlerManager manager = new HandlerManager();
@@ -36,8 +36,8 @@ public class SunnyFlowServer extends Thread {
 				DataInputStream in = new DataInputStream(socket.getInputStream());
 				DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 				
-				String password = in.readUTF();
-				if(password.equals(SunnyFlowUtil.stringToMD5("password123456"))) {
+				String pwd = in.readUTF();
+				if(pwd.equals(password)) {
 					logger.info("成功与远程主机 (" + socket.getRemoteSocketAddress() + ") 建立连接");
 					manager.handle(socket, in, out);
 				} else {
@@ -52,8 +52,7 @@ public class SunnyFlowServer extends Thread {
 			}
 		}
 	}
-
-
+	
 	public HandlerManager getManager() {
 		return manager;
 	}
