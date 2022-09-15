@@ -1,35 +1,34 @@
 package io.github.sunshinewzy.sunnyflow.handler.impl;
 
 import io.github.sunshinewzy.sunnyflow.handler.SunnyFlowHandler;
+import io.github.sunshinewzy.sunnyflow.packet.SunnyFlowPacket;
 import io.github.sunshinewzy.sunnyflow.type.SunnyFlowType;
 import org.bukkit.Bukkit;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Socket;
 
 public class ChatHandler extends SunnyFlowHandler {
 
-	public ChatHandler(DataInputStream in, DataOutputStream out) {
-		super(in, out);
+	public ChatHandler(Socket socket) {
+		super(socket);
 	}
-
+	
 
 	@Override
-	public int getId() {
+	public int getType() {
 		return SunnyFlowType.CLIENT_CHAT;
 	}
 
 	@Override
-	public void handle() throws IOException {
-		String text = in.readUTF();
-		Bukkit.getConsoleSender().sendMessage(text);
+	public void handle(SunnyFlowPacket packet) {
+		Bukkit.getConsoleSender().sendMessage(packet.getText());
 	}
 
+	
 	public void chat(String text) {
 		try {
-			out.writeInt(SunnyFlowType.SERVER_CHAT);
-			out.writeUTF(text);
+			SunnyFlowPacket.write(socket.getOutputStream(), SunnyFlowType.SERVER_CHAT, text);
 		} catch (IOException ignore) {}
 	}
 	

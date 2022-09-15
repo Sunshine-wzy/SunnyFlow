@@ -7,6 +7,8 @@ import java.net.SocketException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SunnyFlowPacket {
 	
@@ -32,38 +34,42 @@ public class SunnyFlowPacket {
 		return payload;
 	}
 	
+	public String getText() {
+		return new String(payload, StandardCharsets.UTF_8);
+	}
+	
+	
 	/**
-	 * Send a Rcon packet and fetch the response
+	 * Send a SunnyFlow packet and fetch the response
 	 * 
-	 * @param rcon Rcon instance
+	 * @param connection SunnyFlowConnection instance
 	 * @param type The packet type
-	 * @param payload The payload (password, command, etc.)
-	 * @return A RconPacket object containing the response
+	 * @param payload The payload (password, message, etc.)
+	 * @return A SunnyFlowPacket object containing the response
 	 */
-	protected static SunnyFlowPacket send(SunnyFlowConnection rcon, int type, byte[] payload) throws IOException {
+	public static SunnyFlowPacket send(SunnyFlowConnection connection, int type, byte[] payload) throws IOException {
 		try {
-			SunnyFlowPacket.write(rcon.getSocket().getOutputStream(), rcon.getRequestId(), type, payload);
-		}
-		catch(SocketException se) {
+			SunnyFlowPacket.write(connection.getSocket().getOutputStream(), connection.getRequestId(), type, payload);
+		} catch (SocketException se) {
 			// Close the socket if something happens
-			rcon.getSocket().close();
+			connection.getSocket().close();
 			
 			// Rethrow the exception
 			throw se;
 		}
 		
-		return SunnyFlowPacket.read(rcon.getSocket().getInputStream());
+		return SunnyFlowPacket.read(connection.getSocket().getInputStream());
 	}
 	
 	/**
-	 * Write a rcon packet on an outputstream
+	 * Write a SunnyFlow packet on an outputstream
 	 * 
 	 * @param out The OutputStream to write on
 	 * @param requestId The request id
 	 * @param type The packet type
 	 * @param payload The payload
 	 */
-	private static void write(OutputStream out, int requestId, int type, byte[] payload) throws IOException {
+	public static void write(OutputStream out, int requestId, int type, byte[] payload) throws IOException {
 		int bodyLength = SunnyFlowPacket.getBodyLength(payload.length);
 		int packetLength = SunnyFlowPacket.getPacketLength(bodyLength);
 		
@@ -83,19 +89,31 @@ public class SunnyFlowPacket {
 		out.write(buffer.array());
 		out.flush();
 	}
+
+	public static void write(OutputStream out, int requestId, int type, String text) throws IOException {
+		write(out, requestId, type, text.getBytes(StandardCharsets.UTF_8));
+	}
+
+	public static void write(OutputStream out, int type, byte[] payload) throws IOException {
+		write(out, ThreadLocalRandom.current().nextInt(), type, payload);
+	}
+
+	public static void write(OutputStream out, int type, String text) throws IOException {
+		write(out, ThreadLocalRandom.current().nextInt(), type, text);
+	}
 	
 	/**
-	 * Read an incoming rcon packet
+	 * Read an incoming SunnyFlow packet
 	 * 
 	 * @param in The InputStream to read on
-	 * @return The read RconPacket
+	 * @return The read SunnyFlowPacket
 	 */
-	private static SunnyFlowPacket read(InputStream in) throws IOException {
+	public static SunnyFlowPacket read(InputStream in) throws IOException {
 		// Header is 3 4-bytes ints
 		byte[] header = new byte[4 * 3];
 		
 		// Read the 3 ints
-		in.read(header);
+		if(in.read(header) < 10) throw new MalformedPacketException("The packet is too short (less than 10 bytes)");
 		
 		try {
 			// Use a bytebuffer in little endian to read the first 3 ints
@@ -115,11 +133,11 @@ public class SunnyFlowPacket {
 			dis.readFully(payload);
 			
 			// Read the null bytes
+			//noinspection ResultOfMethodCallIgnored
 			dis.read(new byte[2]);
 			
 			return new SunnyFlowPacket(requestId, type, payload);
-		}
-		catch(BufferUnderflowException | EOFException e) {
+		} catch (BufferUnderflowException | EOFException ex) {
 			throw new MalformedPacketException("Cannot read the whole packet");
 		}
 	}

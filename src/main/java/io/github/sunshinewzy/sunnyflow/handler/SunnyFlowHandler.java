@@ -1,21 +1,20 @@
 package io.github.sunshinewzy.sunnyflow.handler;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import io.github.sunshinewzy.sunnyflow.packet.SunnyFlowPacket;
+
+import java.net.Socket;
 
 public abstract class SunnyFlowHandler {
-	protected final DataInputStream in;
-	protected final DataOutputStream out;
+	protected final Socket socket;
+
 	
-	public SunnyFlowHandler(DataInputStream in, DataOutputStream out) {
-		this.in = in;
-		this.out = out;
+	protected SunnyFlowHandler(Socket socket) {
+		this.socket = socket;
 	}
 
 
-	public abstract int getId();
+	public abstract int getType();
 	
-	public abstract void handle() throws IOException;
+	public abstract void handle(SunnyFlowPacket packet);
 	
 }

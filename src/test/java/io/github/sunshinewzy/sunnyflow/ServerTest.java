@@ -1,12 +1,10 @@
 package io.github.sunshinewzy.sunnyflow;
 
-import io.github.sunshinewzy.sunnyflow.type.SunnyFlowType;
+import io.github.sunshinewzy.sunnyflow.packet.SunnyFlowConnection;
+import io.github.sunshinewzy.sunnyflow.packet.SunnyFlowPacket;
 import io.github.sunshinewzy.sunnyflow.util.SunnyFlowUtil;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.util.Scanner;
 
 public class ServerTest {
@@ -21,32 +19,29 @@ public class ServerTest {
 	
 	public static void connect() {
 		System.out.println("连接到主机：" + hostname + ":" + port);
-		try(Socket client = new Socket(hostname, port)) {
-			System.out.println("远程主机地址：" + client.getRemoteSocketAddress());
-			DataOutputStream out = new DataOutputStream(client.getOutputStream());
-			DataInputStream in = new DataInputStream(client.getInputStream());
-			
-			String md5 = SunnyFlowUtil.stringToMD5(password);
-			System.out.println(md5);
-			out.writeUTF(md5);
+		
+		try {
+			SunnyFlowConnection connection = new SunnyFlowConnection(hostname, port, SunnyFlowUtil.stringToMD5(password));
 
 			new Thread(() -> {
 				try {
 					Scanner scanner = new Scanner(System.in);
 					while(true) {
 						String str = scanner.nextLine();
-						out.writeInt(SunnyFlowType.CLIENT_CHAT);
-						out.writeUTF(str);
+						connection.message(str);
 					}
-				} catch (IOException e) {
-					throw new RuntimeException(e);
+				} catch (IOException ex) {
+					ex.printStackTrace();
 				}
 			}).start();
-			
+
+			int cnt = 0;
 			while(true) {
-				if(in.readInt() == SunnyFlowType.SERVER_CHAT) {
-					System.out.println("消息：" + in.readUTF());
-				}
+				cnt++;
+				System.out.println(cnt);
+				SunnyFlowPacket packet = connection.read();
+				String text = packet.getText();
+				System.out.println("消息：" + text);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

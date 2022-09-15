@@ -20,11 +20,11 @@ public class SunnyFlowConnection {
 	private Charset charset;
 
 	/**
-	 * Create, connect and authenticate a new Rcon object
+	 * Create, connect and authenticate a new SunnyFlowConnection object
 	 * 
-	 * @param host Rcon server address
-	 * @param port Rcon server port
-	 * @param password Rcon server password
+	 * @param host SunnyFlow server address
+	 * @param port SunnyFlow server port
+	 * @param password SunnyFlow server password
 	 *
 	 */
 	public SunnyFlowConnection(String host, int port, byte[] password) throws IOException, AuthenticationException {
@@ -35,12 +35,17 @@ public class SunnyFlowConnection {
 		this.connect(host, port, password);
 	}
 	
+	public SunnyFlowConnection(String host, int port, String password) throws IOException, AuthenticationException {
+		this(host, port, password.getBytes(StandardCharsets.UTF_8));
+	}
+	
+	
 	/**
-	 * Connect to a rcon server
+	 * Connect to a SunnyFlow server
 	 * 
-	 * @param host Rcon server address
-	 * @param port Rcon server port
-	 * @param password Rcon server password
+	 * @param host SunnyFlow server address
+	 * @param port SunnyFlow server port
+	 * @param password SunnyFlow server password
 	 */
 	public void connect(String host, int port, byte[] password) throws IOException, AuthenticationException {
 		if(host == null || host.trim().isEmpty()) {
@@ -51,7 +56,7 @@ public class SunnyFlowConnection {
 			throw new IllegalArgumentException("Port is out of range");
 		}
 		
-		// Connect to the rcon server
+		// Connect to the SunnyFlow server
 		synchronized(sync) {
 			// New random request id
 			this.requestId = rand.nextInt();
@@ -79,26 +84,45 @@ public class SunnyFlowConnection {
 	}
 	
 	/**
-	 * Send a command to the server
+	 * Send a message to the server
 	 * 
-	 * @param payload The command to send
-	 * @return The payload of the response
+	 * @param text The command to send
 	 */
-	public String command(String payload) throws IOException {
-		if(payload == null || payload.trim().isEmpty()) {
-			throw new IllegalArgumentException("Payload can't be null or empty");
+	public void message(String text) throws IOException {
+		if(text == null || text.trim().isEmpty()) {
+			throw new IllegalArgumentException("Text can't be null or empty");
 		}
 		
-		SunnyFlowPacket response = this.send(SunnyFlowType.CLIENT_CHAT, payload.getBytes(StandardCharsets.UTF_8));
-		
-		return new String(response.getPayload(), this.getCharset());
+		write(SunnyFlowType.CLIENT_CHAT, text);
 	}
 	
-	private SunnyFlowPacket send(int type, byte[] payload) throws IOException {
+	
+	public SunnyFlowPacket send(int type, byte[] payload) throws IOException {
 		synchronized(sync) {
 			return SunnyFlowPacket.send(this, type, payload);
 		}
 	}
+	
+	public void write(int requestId, int type, byte[] payload) throws IOException {
+		SunnyFlowPacket.write(socket.getOutputStream(), requestId, type, payload);
+	}
+
+	public void write(int requestId, int type, String text) throws IOException {
+		SunnyFlowPacket.write(socket.getOutputStream(), requestId, type, text);
+	}
+
+	public void write(int type, byte[] payload) throws IOException {
+		SunnyFlowPacket.write(socket.getOutputStream(), requestId, type, payload);
+	}
+
+	public void write(int type, String text) throws IOException {
+		SunnyFlowPacket.write(socket.getOutputStream(), requestId, type, text);
+	}
+	
+	public SunnyFlowPacket read() throws IOException {
+		return SunnyFlowPacket.read(socket.getInputStream());
+	}
+	
 
 	public int getRequestId() {
 		return requestId;

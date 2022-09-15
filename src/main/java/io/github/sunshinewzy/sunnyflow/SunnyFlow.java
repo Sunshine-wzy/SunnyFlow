@@ -13,7 +13,10 @@ import java.util.Optional;
 
 public class SunnyFlow extends JavaPlugin {
 	public static final PluginManager manager = Bukkit.getPluginManager();
+	
 	private static SunnyFlowServer sunnyFlowServer;
+	
+	private String password;
 	
 
 	@Override
@@ -25,7 +28,7 @@ public class SunnyFlow extends JavaPlugin {
 		getLogger().info("配置文件加载成功!");
 
 		try {
-			sunnyFlowServer = new SunnyFlowServer(getLogger(), 25585);
+			sunnyFlowServer = new SunnyFlowServer(getLogger(), 25585, password);
 			sunnyFlowServer.start();
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -55,19 +58,19 @@ public class SunnyFlow extends JavaPlugin {
 
 		Optional.ofNullable(password.getString("md5"))
 				.filter((md5) -> !md5.contentEquals("password"))
-				.ifPresent((md5) -> SunnyFlowServer.password = md5);
-		if(SunnyFlowServer.password != null) return true;
+				.ifPresent((md5) -> this.password = md5);
+		if(this.password != null) return true;
 
 		Optional.ofNullable(password.getString("text"))
 				.filter((text) -> !text.contentEquals("password"))
 				.ifPresent((text) -> {
 					try {
-						SunnyFlowServer.password = SunnyFlowUtil.stringToMD5(text);
+						this.password = SunnyFlowUtil.stringToMD5(text);
 					} catch (NoSuchAlgorithmException ex) {
 						ex.printStackTrace();
 					}
 				});
-		if(SunnyFlowServer.password != null) return true;
+		if(this.password != null) return true;
 
 		getLogger().info("请修改 password 项中的 md5 或 text 项");
 		return false;
