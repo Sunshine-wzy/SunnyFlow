@@ -15,7 +15,8 @@ public class SunnyFlow extends JavaPlugin {
 	public static final PluginManager manager = Bukkit.getPluginManager();
 	
 	private static SunnyFlowServer sunnyFlowServer;
-	
+
+	private int port;
 	private String password;
 	
 
@@ -28,7 +29,7 @@ public class SunnyFlow extends JavaPlugin {
 		getLogger().info("配置文件加载成功!");
 
 		try {
-			sunnyFlowServer = new SunnyFlowServer(getLogger(), 25585, password);
+			sunnyFlowServer = new SunnyFlowServer(getLogger(), port, password);
 			sunnyFlowServer.start();
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -49,6 +50,8 @@ public class SunnyFlow extends JavaPlugin {
 
 	private boolean loadConfig() {
 		saveDefaultConfig();
+		
+		port = getConfig().getInt("port", 25585);
 		
 		ConfigurationSection password = getConfig().getConfigurationSection("password");
 		if(password == null) {

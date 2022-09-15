@@ -1,3 +1,4 @@
+port: 25585
 password:
   md5: password
   text: password
