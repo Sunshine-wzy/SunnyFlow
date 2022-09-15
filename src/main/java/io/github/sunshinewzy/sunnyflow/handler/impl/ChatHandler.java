@@ -22,7 +22,7 @@ public class ChatHandler extends SunnyFlowHandler {
 
 	@Override
 	public void handle(SunnyFlowPacket packet) {
-		Bukkit.getConsoleSender().sendMessage(packet.getText());
+		Bukkit.broadcastMessage(packet.getText());
 	}
 
 	

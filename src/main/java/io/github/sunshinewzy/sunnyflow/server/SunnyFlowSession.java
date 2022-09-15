@@ -38,6 +38,7 @@ public class SunnyFlowSession extends SunnyFlowThread {
 	
 	@Override
 	public void run() {
+		logger.info("Thread " + name + " starting");
 		int authFailureCount = 0;
 
 		try {
