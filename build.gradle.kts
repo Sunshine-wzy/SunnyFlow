@@ -1,9 +1,10 @@
 plugins {
     id("java")
+    `maven-publish`
 }
 
 group = "io.github.sunshinewzy"
-version = "1.0.1"
+version = "1.0.2"
 
 repositories {
     mavenLocal()
