@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.sunshinewzy"
-version = "1.0.2"
+version = "1.0.3"
 
 repositories {
     mavenLocal()
@@ -44,4 +44,13 @@ tasks {
 //            expand(props)
 //        }
 //    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("library") {
+            from(components["java"])
+            groupId = project.group.toString()
+        }
+    }
 }
