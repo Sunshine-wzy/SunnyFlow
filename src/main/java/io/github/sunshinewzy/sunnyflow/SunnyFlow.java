@@ -15,6 +15,7 @@ public class SunnyFlow extends JavaPlugin {
 	public static final PluginManager manager = Bukkit.getPluginManager();
 	
 	private static SunnyFlowServer sunnyFlowServer;
+	private static String prefix;
 
 	private int port;
 	private String password;
@@ -52,6 +53,7 @@ public class SunnyFlow extends JavaPlugin {
 		saveDefaultConfig();
 		
 		port = getConfig().getInt("port", 25585);
+		prefix = getConfig().getString("prefix", "[群消息] ");
 		
 		ConfigurationSection password = getConfig().getConfigurationSection("password");
 		if(password == null) {
@@ -82,5 +84,9 @@ public class SunnyFlow extends JavaPlugin {
 
 	public static SunnyFlowServer getSunnyFlowServer() {
 		return sunnyFlowServer;
+	}
+
+	public static String getPrefix() {
+		return prefix;
 	}
 }

@@ -29,7 +29,7 @@ tasks.getByName<Test>("test") {
 
 tasks {
     jar {
-//        destinationDirectory.set(file("E:/Kotlin/Debug/Spigot-1.18.2/plugins"))
+        destinationDirectory.set(file("E:/Kotlin/Debug/Spigot-1.18.2/plugins"))
     }
     
 //    processResources {

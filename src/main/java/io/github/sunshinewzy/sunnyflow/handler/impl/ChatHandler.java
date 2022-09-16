@@ -1,5 +1,6 @@
 package io.github.sunshinewzy.sunnyflow.handler.impl;
 
+import io.github.sunshinewzy.sunnyflow.SunnyFlow;
 import io.github.sunshinewzy.sunnyflow.handler.SunnyFlowHandler;
 import io.github.sunshinewzy.sunnyflow.packet.SunnyFlowPacket;
 import io.github.sunshinewzy.sunnyflow.type.SunnyFlowType;
@@ -22,7 +23,7 @@ public class ChatHandler extends SunnyFlowHandler {
 
 	@Override
 	public void handle(SunnyFlowPacket packet) {
-		Bukkit.broadcastMessage(packet.getText());
+		Bukkit.broadcastMessage(SunnyFlow.getPrefix() + packet.getText());
 	}
 
 	
