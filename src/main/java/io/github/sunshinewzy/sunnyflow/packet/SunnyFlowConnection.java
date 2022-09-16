@@ -17,7 +17,10 @@ public class SunnyFlowConnection {
 	private int requestId;
 	private Socket socket;
 	
-	private Charset charset;
+	private Charset charset = StandardCharsets.UTF_8;
+	private final String host;
+	private final int port;
+	private final byte[] password;
 
 	/**
 	 * Create, connect and authenticate a new SunnyFlowConnection object
@@ -28,11 +31,12 @@ public class SunnyFlowConnection {
 	 *
 	 */
 	public SunnyFlowConnection(String host, int port, byte[] password) throws IOException, AuthenticationException {
-		// Default charset is utf8
-		this.charset = StandardCharsets.UTF_8;
-		
+		this.host = host;
+		this.port = port;
+		this.password = password;
+
 		// Connect to host
-		this.connect(host, port, password);
+		connect();
 	}
 	
 	public SunnyFlowConnection(String host, int port, String password) throws IOException, AuthenticationException {
@@ -42,12 +46,8 @@ public class SunnyFlowConnection {
 	
 	/**
 	 * Connect to a SunnyFlow server
-	 * 
-	 * @param host SunnyFlow server address
-	 * @param port SunnyFlow server port
-	 * @param password SunnyFlow server password
 	 */
-	public void connect(String host, int port, byte[] password) throws IOException, AuthenticationException {
+	public void connect() throws IOException, AuthenticationException {
 		if(host == null || host.trim().isEmpty()) {
 			throw new IllegalArgumentException("Host can't be null or empty");
 		}
@@ -140,4 +140,15 @@ public class SunnyFlowConnection {
 		this.charset = charset;
 	}
 
+	public String getHost() {
+		return host;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public byte[] getPassword() {
+		return password;
+	}
 }

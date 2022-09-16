@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.sunshinewzy"
-version = "1.0.3"
+version = "1.0.4"
 
 repositories {
     mavenLocal()
